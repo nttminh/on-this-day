@@ -4,6 +4,7 @@ import com.portfolio.onthisday.domain.Event;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -73,10 +74,11 @@ public class TaggingService {
         Set<String> tags = new TreeSet<>();
 
         String haystack = buildHaystack(event);
+        Set<String> words = tokenize(haystack);
 
         for (Map.Entry<String, List<String>> theme : THEME_KEYWORDS.entrySet()) {
             for (String keyword : theme.getValue()) {
-                if (haystack.contains(keyword)) {
+                if (matches(keyword, haystack, words)) {
                     tags.add(theme.getKey());
                     break;
                 }
@@ -84,7 +86,7 @@ public class TaggingService {
         }
 
         // "Firsts" is a popular browsing theme in its own right.
-        if (haystack.contains("first ") || haystack.contains(" first")) {
+        if (words.contains("first")) {
             tags.add("firsts");
         }
 
@@ -104,6 +106,33 @@ public class TaggingService {
         }
 
         return tags;
+    }
+
+    /**
+     * A keyword matches when: (multi-word phrase) it appears as a substring; or
+     * (single token, treated as a stem) some word in the text starts with it. Stem/prefix
+     * matching avoids substring false positives like "revolution" matching "evolution".
+     */
+    private boolean matches(String keyword, String haystack, Set<String> words) {
+        if (keyword.indexOf(' ') >= 0) {
+            return haystack.contains(keyword);
+        }
+        for (String word : words) {
+            if (word.startsWith(keyword)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Set<String> tokenize(String haystack) {
+        Set<String> words = new LinkedHashSet<>();
+        for (String token : haystack.split("[^a-z0-9]+")) {
+            if (!token.isBlank()) {
+                words.add(token);
+            }
+        }
+        return words;
     }
 
     private String buildHaystack(Event event) {

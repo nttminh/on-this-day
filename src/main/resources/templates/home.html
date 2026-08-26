@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title th:text="'On This Day · ' + ${dateLabel}">On This Day</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet"/>
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" th:href="@{/}">
+        <span class="brand__mark">📅</span>
+        <span class="brand__name">On This Day</span>
+    </a>
+    <nav class="datenav">
+        <a class="datenav__arrow" th:href="@{'/date/' + ${prevMonth} + '/' + ${prevDay}}" title="Previous day">‹</a>
+        <span class="datenav__label" th:text="${dateLabel}">August 26</span>
+        <a class="datenav__arrow" th:href="@{'/date/' + ${nextMonth} + '/' + ${nextDay}}" title="Next day">›</a>
+    </nav>
+    <a class="topbar__api" th:href="@{/swagger-ui.html}" target="_blank" rel="noopener">API</a>
+</header>
+
+<section class="hero">
+    <h1 class="hero__title">What happened on <span class="hero__date" th:text="${dateLabel}">this day</span>?</h1>
+    <p class="hero__sub">Real historical events, births, deaths &amp; holidays — sourced live from Wikipedia.</p>
+</section>
+
+<!-- Tag chips -->
+<div class="chips" th:if="${!tags.isEmpty()}">
+    <a class="chip" th:classappend="${activeTag == null} ? 'chip--active'"
+       th:href="@{'/date/' + ${month} + '/' + ${day}}">All</a>
+    <a class="chip" th:each="t : ${tags}"
+       th:text="${t}"
+       th:classappend="${t == activeTag} ? 'chip--active'"
+       th:href="@{'/date/' + ${month} + '/' + ${day}(tag=${t})}">tag</a>
+</div>
+
+<!-- Masonry grid. data-* attributes drive infinite scroll in app.js -->
+<main id="grid" class="grid"
+      th:attr="data-month=${month},data-day=${day},data-tag=${activeTag},data-size=${pageSize},data-nextpage=1,data-hasnext=${firstPage.hasNext()}">
+
+    <!-- First page rendered server-side; app.js appends the rest -->
+    <a th:each="e : ${firstPage.content()}"
+       class="tile"
+       th:classappend="'tile--' + ${#strings.toLowerCase(e.feedType())}"
+       th:href="@{'/event/' + ${e.id()}}">
+        <div class="tile__media">
+            <img th:if="${e.thumbnailUrl() != null}" th:src="${e.thumbnailUrl()}" th:alt="${e.title()}" loading="lazy"/>
+            <span class="tile__badge" th:if="${e.year() != null}" th:text="${e.year()}">1969</span>
+            <span class="tile__feed" th:text="${#strings.toLowerCase(e.feedType())}">events</span>
+        </div>
+        <div class="tile__body">
+            <p class="tile__text" th:text="${e.text()}">Something happened.</p>
+            <div class="tile__tags">
+                <span class="minichip" th:each="tag : ${e.tags()}" th:text="${tag}">tag</span>
+            </div>
+        </div>
+    </a>
+</main>
+
+<div id="sentinel" class="sentinel"></div>
+<div id="empty" class="empty" th:if="${firstPage.content().isEmpty()}">
+    <p>No events stored for <strong th:text="${dateLabel}">this day</strong> yet.</p>
+    <p class="empty__hint">If the app can reach Wikipedia, they'll load automatically. Otherwise enable the dev seed
+        (<code>onthisday.seed.enabled=true</code>) or try <a th:href="@{/date/7/20}">July 20</a>.</p>
+</div>
+
+<footer class="footer">
+    <p>Data from the <a href="https://api.wikimedia.org/wiki/Feed_API/Reference/On_this_day" target="_blank" rel="noopener">Wikimedia On This Day API</a>. A Spring Boot portfolio project.</p>
+</footer>
+
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>
