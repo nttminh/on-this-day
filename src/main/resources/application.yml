@@ -60,6 +60,20 @@ wikipedia:
     # See https://api.wikimedia.org/wiki/Documentation
     user-agent: "OnThisDay/0.1 (portfolio project; https://github.com/nttminh/on-this-day)"
 
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
 logging:
   level:
     com.portfolio.onthisday: INFO
