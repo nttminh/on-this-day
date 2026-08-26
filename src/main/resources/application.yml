@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: on-this-day
+
+wikipedia:
+  api:
+    # Wikimedia REST API root. Feed paths are appended by the client.
+    #
+    # Two interchangeable public endpoints expose the same "On This Day" data. Switch
+    # between them by changing base-url + path-template together (no code change):
+    #
+    #  1. api.wikimedia.org (default; the modern Wikimedia Enterprise-style API):
+    #       base-url:      https://api.wikimedia.org
+    #       path-template: /feed/v1/wikipedia/en/onthisday/{type}/{month}/{day}
+    #
+    #  2. en.wikipedia.org REST v1 (the classic, always-unauthenticated feed):
+    #       base-url:      https://en.wikipedia.org
+    #       path-template: /api/rest_v1/feed/onthisday/{type}/{month}/{day}
+    #
+    # If option 1 ever returns 401/403 for your network, switch to option 2.
+    base-url: https://api.wikimedia.org
+    path-template: /feed/v1/wikipedia/en/onthisday/{type}/{month}/{day}
+    # A descriptive User-Agent is requested by Wikimedia so they can reach the operator.
+    # See https://api.wikimedia.org/wiki/Documentation
+    user-agent: "OnThisDay/0.1 (portfolio project; https://github.com/nttminh/on-this-day)"
+
+logging:
+  level:
+    com.portfolio.onthisday: INFO
