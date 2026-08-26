@@ -1,0 +1,28 @@
+# Profile activated in the Docker image (SPRING_PROFILES_ACTIVE=docker).
+# Uses PostgreSQL instead of the local H2 file database.
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:db}:${DB_PORT:5432}/${DB_NAME:onthisday}
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USER:onthisday}
+    password: ${DB_PASSWORD:onthisday}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate.jdbc.time_zone: UTC
+
+  h2:
+    console:
+      enabled: false
+
+onthisday:
+  fetch:
+    # Pull today's real events on startup (needs outbound access to Wikipedia).
+    on-startup: true
+  seed:
+    # Also load the bundled real-event snapshot so the demo has content even if
+    # the container can't reach Wikipedia. Deduped against live data. Set to
+    # false for a pure live-data deployment.
+    enabled: true

@@ -26,3 +26,8 @@ target/
 
 ### Logs ###
 *.log
+
+### Local H2 database files ###
+data/
+*.mv.db
+*.trace.db
