@@ -1,5 +1,6 @@
 package com.portfolio.onthisday.client;
 
+import com.portfolio.onthisday.domain.FeedType;
 import com.portfolio.onthisday.dto.OnThisDayResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,25 +41,6 @@ public class WikipediaOnThisDayClient {
             @Value("${wikipedia.api.path-template}") String pathTemplate) {
         this.wikipediaWebClient = wikipediaWebClient;
         this.pathTemplate = pathTemplate;
-    }
-
-    /** Feed types supported by the "On This Day" endpoint. */
-    public enum FeedType {
-        EVENTS("events"),
-        SELECTED("selected"),
-        BIRTHS("births"),
-        DEATHS("deaths"),
-        HOLIDAYS("holidays");
-
-        private final String path;
-
-        FeedType(String path) {
-            this.path = path;
-        }
-
-        public String path() {
-            return path;
-        }
     }
 
     /** Fetch the "events" feed for the month/day of the given date. */
